@@ -31,6 +31,8 @@ class DatesHeader(tk.Frame):
                 justify=tk.CENTER,
                 borderwidth=1,
                 relief="ridge",
+                bg="#F0F0F0",
+                fg="black",
             )
             dayLabel.grid(row=0, column=i, sticky=tk.NSEW)
 
@@ -40,6 +42,8 @@ class DatesHeader(tk.Frame):
                 justify=tk.CENTER,
                 borderwidth=1,
                 relief="ridge",
+                bg="#F0F0F0",
+                fg="black",
             )
             numLabel.grid(row=0, column=i, sticky=tk.NSEW)
             self.numLabels.append(numLabel)

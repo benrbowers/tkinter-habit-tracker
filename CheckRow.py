@@ -17,7 +17,9 @@ class CheckRow(tk.Frame):
         if altColor:
             bgColor = "lightgray"
 
-        habitLabel = tk.Label(self, text=(habitName + ":"), anchor=tk.W, bg=bgColor)
+        habitLabel = tk.Label(
+            self, text=(habitName + ":"), anchor=tk.W, bg=bgColor, fg="black"
+        )
         habitLabel.grid(row=0, column=0, sticky=tk.NSEW)
 
         self.checkVars = [tk.IntVar() for _ in range(7)]

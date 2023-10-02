@@ -30,7 +30,7 @@ class HabitTracker(tk.Tk):
 
         self.altColor = True
 
-        self.middleFrame = tk.Frame(self)
+        self.middleFrame = tk.Frame(self, bg="#F0F0F0")
 
         buttonFont = tkFont.Font(family="Helvetica", size=20, weight="bold")
 
