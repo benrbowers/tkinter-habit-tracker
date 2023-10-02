@@ -1,0 +1,155 @@
+import tkinter as tk
+import tkinter.font as tkFont
+import tkinter.simpledialog as tkDialog
+from CheckRow import CheckRow
+from DatesHeader import DatesHeader
+from datetime import date, timedelta
+from typing import List
+import json
+from os.path import exists
+
+
+class HabitTracker(tk.Tk):
+    def __init__(self):
+        tk.Tk.__init__(self)
+
+        self.title("Habit Tracker (made with tkinter)")
+        self.geometry("700x500")
+
+        self.habitDict = {}
+        self.checkRows: List[CheckRow] = []
+
+        self.grid_columnconfigure(index=0, weight=1)
+        self.grid_columnconfigure(index=1, weight=9)
+        self.grid_columnconfigure(index=2, weight=1)
+        self.grid_rowconfigure(index=0, weight=1)
+
+        today = date.today()
+        daysFromMonday = today.weekday()
+        self.thisWeek = today - timedelta(days=daysFromMonday)
+
+        self.altColor = True
+
+        self.middleFrame = tk.Frame(self)
+
+        buttonFont = tkFont.Font(family="Helvetica", size=20, weight="bold")
+
+        b1 = tk.Button(self, text="<", font=buttonFont, command=self.decrementWeek)
+        b2 = tk.Button(self, text=">", font=buttonFont, command=self.incrementWeek)
+
+        b1.grid(row=0, column=0, sticky="nsew")
+
+        b2.grid(row=0, column=2, sticky="nsew")
+
+        self.middleFrame.grid(row=0, column=1, sticky="nsew")
+
+        self.datesHeader = DatesHeader(self.middleFrame)
+        self.datesHeader.pack(fill=tk.X)
+
+        addHabitBtn = tk.Button(
+            self.middleFrame,
+            text="+ Habit",
+            command=self.addHabit,
+            font=buttonFont,
+            justify=tk.CENTER,
+        )
+        addHabitBtn.pack(side=tk.BOTTOM)
+
+        self.protocol("WM_DELETE_WINDOW", self.onClosing)
+
+        self.loadHabits()
+
+        self.updateChecks()
+
+        # 1. Create label + checks component
+        # 2. Add button that adds a CheckRow
+        # 3. Create dates header
+        # 4. Change dates when side buttons are pressed
+        # 5. Create storage structure
+        # 6. Create handleCheck function that updates storage structure
+        # 7. Save to and load from JSON
+
+    def incrementWeek(self):
+        self.updateHabitDict()
+
+        newWeek = self.thisWeek + timedelta(days=7)
+        self.datesHeader.updateLabels(newWeek)
+        self.thisWeek = newWeek
+
+        self.updateChecks()
+
+    def decrementWeek(self):
+        self.updateHabitDict()
+
+        newWeek = self.thisWeek - timedelta(days=7)
+        self.datesHeader.updateLabels(newWeek)
+        self.thisWeek = newWeek
+
+        self.updateChecks()
+
+    def updateHabitDict(self):
+        for row in self.checkRows:
+            for i, check in enumerate(row.checkVars):
+                day = (self.thisWeek + timedelta(days=i)).strftime("%m-%d-%Y")
+
+                if check.get():
+                    if day not in self.habitDict[row.habitName]:
+                        self.habitDict[row.habitName].append(day)
+
+    def updateChecks(self):
+        for row in self.checkRows:
+            for i, check in enumerate(row.checkVars):
+                day = (self.thisWeek + timedelta(days=i)).strftime("%m-%d-%Y")
+
+                if day in self.habitDict[row.habitName]:
+                    check.set(1)
+                else:
+                    check.set(0)
+
+    def addHabit(self):
+        habitName = tkDialog.askstring(
+            "Habit Name", "Please enter a name for your new habit."
+        )
+
+        while habitName in self.habitDict:
+            habitName = tkDialog.askstring(
+                "Habit Name Already Exists",
+                '"' + habitName + '" already exists. Please choose a new name.',
+            )
+
+        newRow = CheckRow(self.middleFrame, habitName, altColor=self.altColor)
+        newRow.pack(fill=tk.X)
+        self.checkRows.append(newRow)
+
+        self.altColor = not self.altColor
+
+        self.habitDict[habitName] = []
+
+    def loadHabits(self):
+        if exists("data.json"):
+            jsonFile = open("data.json", "r")
+
+            self.habitDict = json.load(jsonFile)
+
+            jsonFile.close()
+
+            for i, habit in enumerate(self.habitDict):
+                newRow = CheckRow(self.middleFrame, habit, altColor=self.altColor)
+                newRow.pack(fill=tk.X)
+                self.checkRows.append(newRow)
+
+                self.altColor = not self.altColor
+
+    def onClosing(self):
+        self.updateHabitDict()
+
+        jsonFile = open("data.json", "w")
+
+        json.dump(self.habitDict, jsonFile)
+
+        jsonFile.close()
+
+        self.destroy()
+
+
+HabitTracker().mainloop()
