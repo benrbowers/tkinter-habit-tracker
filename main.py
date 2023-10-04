@@ -109,8 +109,13 @@ class HabitTracker(tk.Tk):
                 day = (self.thisWeek + timedelta(days=i)).strftime("%m-%d-%Y")
 
                 if check.get():
+                    # Check is checked
                     if day not in self.habitDict[row.habitName]:
+                        # Selected day is not in habitDict, so add it
                         self.habitDict[row.habitName].append(day)
+                elif day in self.habitDict[row.habitName]:
+                    # Check is NOT checked AND day is in habitDict, so remove it
+                    self.habitDict[row.habitName].remove(day)
 
     def updateChecks(self):
         for row in self.checkRows:
