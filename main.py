@@ -10,6 +10,8 @@ from os.path import exists
 
 
 class HabitTracker(tk.Tk):
+    """Habit Tracker program that allow user to define habits and track their progress"""
+
     def __init__(self):
         tk.Tk.__init__(self)
 
@@ -52,9 +54,7 @@ class HabitTracker(tk.Tk):
 
         self.middleFrame.grid(row=0, column=1, sticky="nsew")
 
-        self.datesHeader = DatesHeader(
-            self.middleFrame
-        )  # Header with week days and dates
+        self.datesHeader = DatesHeader(self.middleFrame)  # Header with week days and dates
         self.datesHeader.pack(fill=tk.X)
 
         addHabitBtn = tk.Button(
@@ -71,14 +71,6 @@ class HabitTracker(tk.Tk):
         self.loadHabits()
 
         self.updateChecks()
-
-        # 1. Create label + checks component
-        # 2. Add button that adds a CheckRow
-        # 3. Create dates header
-        # 4. Change dates when side buttons are pressed
-        # 5. Create storage structure
-        # 6. Create handleCheck function that updates storage structure
-        # 7. Save to and load from JSON
 
     def incrementWeek(self):
         """Increment self.thisWeek by 7 days and update date labels"""
@@ -104,6 +96,7 @@ class HabitTracker(tk.Tk):
 
     def updateHabitDict(self):
         """Using current state of checks, update habit dictionary"""
+
         for row in self.checkRows:
             for i, check in enumerate(row.checkVars):
                 day = (self.thisWeek + timedelta(days=i)).strftime("%m-%d-%Y")
@@ -118,19 +111,23 @@ class HabitTracker(tk.Tk):
                     self.habitDict[row.habitName].remove(day)
 
     def updateChecks(self):
+        """Update check marks according to habit data and the current week"""
+
         for row in self.checkRows:
             for i, check in enumerate(row.checkVars):
                 day = (self.thisWeek + timedelta(days=i)).strftime("%m-%d-%Y")
 
                 if day in self.habitDict[row.habitName]:
-                    check.set(1)
+                    check.set(1)  # checked
                 else:
-                    check.set(0)
+                    check.set(0)  # unchecked
 
     def addHabit(self):
+        """Prompt user for new habit name and add it to the window"""
+
         habitName = tkDialog.askstring(
             "Habit Name", "Please enter a name for your new habit."
-        )
+        )  # Name of the new habit
 
         while habitName in self.habitDict:
             habitName = tkDialog.askstring(
@@ -138,23 +135,29 @@ class HabitTracker(tk.Tk):
                 '"' + habitName + '" already exists. Please choose a new name.',
             )
 
-        newRow = CheckRow(self.middleFrame, habitName, altColor=self.altColor)
+        newRow = CheckRow(
+            self.middleFrame, habitName, altColor=self.altColor
+        )  # New row of check marks for the new habits
         newRow.pack(fill=tk.X)
         self.checkRows.append(newRow)
 
-        self.altColor = not self.altColor
+        self.altColor = not self.altColor  # Flip between colors for each row
 
-        self.habitDict[habitName] = []
+        self.habitDict[
+            habitName
+        ] = []  # Add habitName as key to habitDict and init with empty list for dates
 
     def loadHabits(self):
+        """Load habits from file called data.json"""
+
         if exists("data.json"):
-            jsonFile = open("data.json", "r")
+            jsonFile = open("data.json", "r")  # File handle for data.json
 
             self.habitDict = json.load(jsonFile)
 
             jsonFile.close()
 
-            for i, habit in enumerate(self.habitDict):
+            for habit in self.habitDict:
                 newRow = CheckRow(self.middleFrame, habit, altColor=self.altColor)
                 newRow.pack(fill=tk.X)
                 self.checkRows.append(newRow)
@@ -162,9 +165,11 @@ class HabitTracker(tk.Tk):
                 self.altColor = not self.altColor
 
     def onClosing(self):
+        """To be executed on window close. Save habits to data.json"""
+
         self.updateHabitDict()
 
-        jsonFile = open("data.json", "w")
+        jsonFile = open("data.json", "w")  # File handle for data.json
 
         json.dump(self.habitDict, jsonFile)
 
