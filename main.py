@@ -33,19 +33,19 @@ class HabitTracker(tk.Tk):
             days=daysFromMonday
         )  # Date of this week's Monday
 
-        self.altColor = True  # Whether or not to use alternate bg color for CheckRow
+        self.altColor = True # Whether or not to use alternate bg color for CheckRow
 
         self.middleFrame = tk.Frame(
             self, bg="#F0F0F0"
         )  # Main area where habits are listed
 
-        buttonFont = tkFont.Font(family="Helvetica", size=20, weight="bold")
+        largeFont = tkFont.Font(family="Helvetica", size=20, weight="bold")
 
         lastWeekBtn = tk.Button(
-            self, text="<", font=buttonFont, command=self.decrementWeek
+            self, text="<", font=largeFont, command=self.decrementWeek
         )
         nextWeekBtn = tk.Button(
-            self, text=">", font=buttonFont, command=self.incrementWeek
+            self, text=">", font=largeFont, command=self.incrementWeek
         )
 
         lastWeekBtn.grid(row=0, column=0, sticky="nsew")
@@ -54,6 +54,20 @@ class HabitTracker(tk.Tk):
 
         self.middleFrame.grid(row=0, column=1, sticky="nsew")
 
+        self.monthVar = tk.StringVar(
+            self.middleFrame, 
+            self.thisWeek.strftime("%B %Y")
+        ) # Variable to update month label
+        monthLabel = tk.Label(
+            self.middleFrame,
+            justify=tk.CENTER, 
+            font=largeFont, 
+            textvariable=self.monthVar,
+            bg="#F0F0F0",
+            fg="black",
+        ) # Label for current month that will update with thisWeek
+        monthLabel.pack(fill=tk.X)
+
         self.datesHeader = DatesHeader(self.middleFrame)  # Header with week days and dates
         self.datesHeader.pack(fill=tk.X)
 
@@ -61,7 +75,7 @@ class HabitTracker(tk.Tk):
             self.middleFrame,
             text="+ Habit",
             command=self.addHabit,
-            font=buttonFont,
+            font=largeFont,
             justify=tk.CENTER,
         )
         addHabitBtn.pack(side=tk.BOTTOM)
@@ -81,6 +95,8 @@ class HabitTracker(tk.Tk):
         self.datesHeader.updateLabels(newWeek)
         self.thisWeek = newWeek
 
+        self.monthVar.set(newWeek.strftime("%B %Y"))
+
         self.updateChecks()
 
     def decrementWeek(self):
@@ -91,6 +107,8 @@ class HabitTracker(tk.Tk):
         newWeek = self.thisWeek - timedelta(days=7)
         self.datesHeader.updateLabels(newWeek)
         self.thisWeek = newWeek
+
+        self.monthVar.set(newWeek.strftime("%B %Y"))
 
         self.updateChecks()
 
