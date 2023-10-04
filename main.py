@@ -16,9 +16,10 @@ class HabitTracker(tk.Tk):
         self.title("Habit Tracker (made with tkinter)")
         self.geometry("700x500")
 
-        self.habitDict = {}
-        self.checkRows: List[CheckRow] = []
+        self.habitDict = {}  # Dictionary to store habit info
+        self.checkRows: List[CheckRow] = []  # List to store CheckRow components
 
+        # Set up grid for main window
         self.grid_columnconfigure(index=0, weight=1)
         self.grid_columnconfigure(index=1, weight=9)
         self.grid_columnconfigure(index=2, weight=1)
@@ -26,24 +27,34 @@ class HabitTracker(tk.Tk):
 
         today = date.today()
         daysFromMonday = today.weekday()
-        self.thisWeek = today - timedelta(days=daysFromMonday)
+        self.thisWeek = today - timedelta(
+            days=daysFromMonday
+        )  # Date of this week's Monday
 
-        self.altColor = True
+        self.altColor = True  # Whether or not to use alternate bg color for CheckRow
 
-        self.middleFrame = tk.Frame(self, bg="#F0F0F0")
+        self.middleFrame = tk.Frame(
+            self, bg="#F0F0F0"
+        )  # Main area where habits are listed
 
         buttonFont = tkFont.Font(family="Helvetica", size=20, weight="bold")
 
-        b1 = tk.Button(self, text="<", font=buttonFont, command=self.decrementWeek)
-        b2 = tk.Button(self, text=">", font=buttonFont, command=self.incrementWeek)
+        lastWeekBtn = tk.Button(
+            self, text="<", font=buttonFont, command=self.decrementWeek
+        )
+        nextWeekBtn = tk.Button(
+            self, text=">", font=buttonFont, command=self.incrementWeek
+        )
 
-        b1.grid(row=0, column=0, sticky="nsew")
+        lastWeekBtn.grid(row=0, column=0, sticky="nsew")
 
-        b2.grid(row=0, column=2, sticky="nsew")
+        nextWeekBtn.grid(row=0, column=2, sticky="nsew")
 
         self.middleFrame.grid(row=0, column=1, sticky="nsew")
 
-        self.datesHeader = DatesHeader(self.middleFrame)
+        self.datesHeader = DatesHeader(
+            self.middleFrame
+        )  # Header with week days and dates
         self.datesHeader.pack(fill=tk.X)
 
         addHabitBtn = tk.Button(
@@ -70,6 +81,8 @@ class HabitTracker(tk.Tk):
         # 7. Save to and load from JSON
 
     def incrementWeek(self):
+        """Increment self.thisWeek by 7 days and update date labels"""
+
         self.updateHabitDict()
 
         newWeek = self.thisWeek + timedelta(days=7)
@@ -79,6 +92,8 @@ class HabitTracker(tk.Tk):
         self.updateChecks()
 
     def decrementWeek(self):
+        """Decrement self.thisWeek by 7 days and update date labels"""
+
         self.updateHabitDict()
 
         newWeek = self.thisWeek - timedelta(days=7)
@@ -88,6 +103,7 @@ class HabitTracker(tk.Tk):
         self.updateChecks()
 
     def updateHabitDict(self):
+        """Using current state of checks, update habit dictionary"""
         for row in self.checkRows:
             for i, check in enumerate(row.checkVars):
                 day = (self.thisWeek + timedelta(days=i)).strftime("%m-%d-%Y")
