@@ -39,5 +39,6 @@ class CheckRow:
                 variable=self.checkVars[i - 1],
                 bg=bgColor,
                 activebackground=bgColor,
+                justify=tk.CENTER,
             )
             check.grid(row=row, column=i, sticky=tk.NSEW)

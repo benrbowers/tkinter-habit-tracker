@@ -3,28 +3,22 @@ from datetime import date, timedelta
 from typing import List
 
 
-class DatesHeader(tk.Frame):
+class DatesHeader:
     """Header component that contains a row of day names and a row of dates"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, master=None):
         """Constructor for DatesHeader"""
 
-        tk.Frame.__init__(self, *args, **kwargs)
         today = date.today()
         daysFromMonday = today.weekday()
         self.thisWeek = today - timedelta(
             days=daysFromMonday
         )  # Date of this week's Monday
 
-        dayFrame = tk.Frame(
-            self
-        )  # Frame for labels containing day names (e.g., Mon, Tue)
-        dayFrame.grid_rowconfigure(index=0, weight=1)
-        dayFrame.grid_columnconfigure(index=0, weight=2)
-
-        dateFrame = tk.Frame(self)  # Frame for labels containing dates (e.g., 30, 31)
-        dateFrame.grid_rowconfigure(index=0, weight=1)
-        dateFrame.grid_columnconfigure(index=0, weight=2)
+        nameLabel = tk.Label(
+            master, text="Habit Name", justify=tk.CENTER
+        )  # Column label for habit names
+        nameLabel.grid(row=0, column=0, rowspan=2, sticky=tk.NSEW)
 
         self.dateLabels: List[
             tk.Label
@@ -33,11 +27,8 @@ class DatesHeader(tk.Frame):
         for i in range(1, 8):
             day = self.thisWeek + timedelta(days=(i - 1))
 
-            dayFrame.grid_columnconfigure(index=i, weight=1)
-            dateFrame.grid_columnconfigure(index=i, weight=1)
-
             dayLabel = tk.Label(
-                dayFrame,
+                master,
                 text=day.strftime("%a"),
                 justify=tk.CENTER,
                 borderwidth=1,
@@ -48,7 +39,7 @@ class DatesHeader(tk.Frame):
             dayLabel.grid(row=0, column=i, sticky=tk.NSEW)
 
             dateLabel = tk.Label(
-                dateFrame,
+                master,
                 text=day.strftime("%d"),
                 justify=tk.CENTER,
                 borderwidth=1,
@@ -56,11 +47,8 @@ class DatesHeader(tk.Frame):
                 bg="#F0F0F0",
                 fg="black",
             )  # Label for date
-            dateLabel.grid(row=0, column=i, sticky=tk.NSEW)
+            dateLabel.grid(row=1, column=i, sticky=tk.NSEW)
             self.dateLabels.append(dateLabel)
-
-        dayFrame.pack(fill=tk.X, expand=True)
-        dateFrame.pack(fill=tk.X, expand=True)
 
     def updateLabels(self, newWeek: date):
         """
