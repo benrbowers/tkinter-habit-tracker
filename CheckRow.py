@@ -1,11 +1,11 @@
 import tkinter as tk
 
 
-class CheckRow(tk.Frame):
+class CheckRow:
     """Component with habit label and 7 checks for each day of the week"""
 
     def __init__(
-        self, master=None, habitName: str = "", altColor: bool = False, *args, **kwargs
+        self, row: int, master=None, habitName: str = "", altColor: bool = False
     ):
         """
         Constructor for CheckRow
@@ -19,30 +19,25 @@ class CheckRow(tk.Frame):
             altColor: bool
                 Whether to use alternate bg color
         """
-        tk.Frame.__init__(self, master, *args, **kwargs)
 
-        self.habitName = habitName  #
-
-        self.grid_rowconfigure(index=0, weight=1)
-        self.grid_columnconfigure(index=0, weight=2)
+        self.habitName = habitName  # Name of this row's habit
 
         bgColor = "#F0F0F0"
         if altColor:
             bgColor = "lightgray"
 
         habitLabel = tk.Label(
-            self, text=(habitName + ":"), anchor=tk.W, bg=bgColor, fg="black"
+            master, text=(habitName + ":"), anchor=tk.W, bg=bgColor, fg="black"
         )
-        habitLabel.grid(row=0, column=0, sticky=tk.NSEW)
+        habitLabel.grid(row=row, column=0, sticky=tk.NSEW)
 
         self.checkVars = [tk.IntVar() for _ in range(7)]
 
         for i in range(1, 8):
-            self.grid_columnconfigure(index=i, weight=1)
             check = tk.Checkbutton(
-                self,
+                master,
                 variable=self.checkVars[i - 1],
                 bg=bgColor,
                 activebackground=bgColor,
             )
-            check.grid(row=0, column=i, sticky=tk.NSEW)
+            check.grid(row=row, column=i, sticky=tk.NSEW)

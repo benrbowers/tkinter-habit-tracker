@@ -12,9 +12,13 @@ class DatesHeader(tk.Frame):
         tk.Frame.__init__(self, *args, **kwargs)
         today = date.today()
         daysFromMonday = today.weekday()
-        self.thisWeek = today - timedelta(days=daysFromMonday)  # Date of this week's Monday
+        self.thisWeek = today - timedelta(
+            days=daysFromMonday
+        )  # Date of this week's Monday
 
-        dayFrame = tk.Frame(self)  # Frame for labels containing day names (e.g., Mon, Tue)
+        dayFrame = tk.Frame(
+            self
+        )  # Frame for labels containing day names (e.g., Mon, Tue)
         dayFrame.grid_rowconfigure(index=0, weight=1)
         dayFrame.grid_columnconfigure(index=0, weight=2)
 
@@ -22,7 +26,9 @@ class DatesHeader(tk.Frame):
         dateFrame.grid_rowconfigure(index=0, weight=1)
         dateFrame.grid_columnconfigure(index=0, weight=2)
 
-        self.dateLabels: List[tk.Label] = []  # List for storing date labels, which will all need to be updated
+        self.dateLabels: List[
+            tk.Label
+        ] = []  # List for storing date labels, which will all need to be updated
 
         for i in range(1, 8):
             day = self.thisWeek + timedelta(days=(i - 1))
@@ -66,6 +72,8 @@ class DatesHeader(tk.Frame):
                 Date of the Monday for selected week
         """
         for i, label in enumerate(self.dateLabels):
-            day = newWeek + timedelta(days=(i))  # Monday's date + i, starting at 0 for Mon-Sun
+            day = newWeek + timedelta(
+                days=(i)
+            )  # Monday's date + i, starting at 0 for Mon-Sun
 
             label["text"] = day.strftime("%d")

@@ -21,6 +21,8 @@ class HabitTracker(tk.Tk):
         self.habitDict = {}  # Dictionary to store habit info
         self.checkRows: List[CheckRow] = []  # List to store CheckRow components
 
+        self.numHabits = 0  # Number of habits currently created
+
         # Set up grid for main window
         self.grid_columnconfigure(index=0, weight=1)
         self.grid_columnconfigure(index=1, weight=9)
@@ -33,11 +35,11 @@ class HabitTracker(tk.Tk):
             days=daysFromMonday
         )  # Date of this week's Monday
 
-        self.altColor = True # Whether or not to use alternate bg color for CheckRow
+        self.altColor = True  # Whether or not to use alternate bg color for CheckRow
 
         self.middleFrame = tk.Frame(
             self, bg="#F0F0F0"
-        )  # Main area where habits are listed
+        )  # Main area with habits and labels
 
         largeFont = tkFont.Font(family="Helvetica", size=20, weight="bold")
 
@@ -55,20 +57,21 @@ class HabitTracker(tk.Tk):
         self.middleFrame.grid(row=0, column=1, sticky="nsew")
 
         self.monthVar = tk.StringVar(
-            self.middleFrame, 
-            self.thisWeek.strftime("%B %Y")
-        ) # Variable to update month label
+            self.middleFrame, self.thisWeek.strftime("%B %Y")
+        )  # Variable to update month label
         monthLabel = tk.Label(
             self.middleFrame,
-            justify=tk.CENTER, 
-            font=largeFont, 
+            justify=tk.CENTER,
+            font=largeFont,
             textvariable=self.monthVar,
             bg="#F0F0F0",
             fg="black",
-        ) # Label for current month that will update with thisWeek
+        )  # Label for current month that will update with thisWeek
         monthLabel.pack(fill=tk.X)
 
-        self.datesHeader = DatesHeader(self.middleFrame)  # Header with week days and dates
+        self.datesHeader = DatesHeader(
+            self.middleFrame
+        )  # Header with week days and dates
         self.datesHeader.pack(fill=tk.X)
 
         addHabitBtn = tk.Button(
@@ -79,6 +82,17 @@ class HabitTracker(tk.Tk):
             justify=tk.CENTER,
         )
         addHabitBtn.pack(side=tk.BOTTOM)
+
+        self.checkFrame = tk.Frame(self.middleFrame, bg="#F0F0F0")
+        self.checkFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        self.checkFrame.grid_columnconfigure(index=0, weight=2)
+
+        for i in range(1, 8):
+            self.checkFrame.grid_columnconfigure(index=i, weight=1)
+
+        for i in range(15):
+            self.checkFrame.grid_rowconfigure(index=i, weight=1)
 
         self.protocol("WM_DELETE_WINDOW", self.onClosing)
 
@@ -154,10 +168,11 @@ class HabitTracker(tk.Tk):
             )
 
         newRow = CheckRow(
-            self.middleFrame, habitName, altColor=self.altColor
+            self.numHabits, self.checkFrame, habitName, altColor=self.altColor
         )  # New row of check marks for the new habits
-        newRow.pack(fill=tk.X)
         self.checkRows.append(newRow)
+
+        self.numHabits += 1
 
         self.altColor = not self.altColor  # Flip between colors for each row
 
@@ -175,10 +190,11 @@ class HabitTracker(tk.Tk):
 
             jsonFile.close()
 
-            for habit in self.habitDict:
-                newRow = CheckRow(self.middleFrame, habit, altColor=self.altColor)
-                newRow.pack(fill=tk.X)
+            for i, habit in enumerate(self.habitDict):
+                newRow = CheckRow(i, self.checkFrame, habit, altColor=self.altColor)
                 self.checkRows.append(newRow)
+
+                self.numHabits += 1
 
                 self.altColor = not self.altColor
 
